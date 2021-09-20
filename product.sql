@@ -1,0 +1,5 @@
+DROP TABLE IF EXISTS product;
+CREATE TABLE product (
+	name varchar(10) NOT NULL UNIQUE PRIMARY KEY,
+	stock INT NOT NULL
+);
