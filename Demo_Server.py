@@ -1,6 +1,7 @@
 #Import modules (SQL and networking)
 import sqlite3
 import socket
+import os
 #This function listens on port 12345 for connections
 def startServer():
     #Set variables to be global (Allows for interaction in any function)
@@ -27,6 +28,10 @@ def changeStock():
         #Get number from network connection
         change_amount = c.recv(1024).decode('utf-8')
         if int(change_amount) == 0:
+            c.sendall("Enter reason for exit: ".encode('utf-8'))
+            log_reason_for_exit = str(c.recv(1024).decode('utf-8'))
+            command = str("echo '" + log_reason_for_exit + "' >> exit.log")
+            os.system(command)
             exit()
         #Pipe the number into the function modifyDB
         modifyDB(change_amount)
