@@ -11,6 +11,7 @@ Run `Demo_SQL.py` to reset the database. The default stock volume is 10.
 When exiting, it will prompt for exit reason. The input will then be saved to a file `exit.log`. To write to the log file, os.system is used to echo and pipe the 
 output into file. The usage of command shell to interact with files is insecure. A command could escape into shell through escaping the quotes.
 e.g. `Done'; ENTER_SHELL_COMMAND_HERE; echo 'Done`
+*Leads to remote code execution and full control of the server within user privileges.*
 # Working on:
 - Authentication
 - Client side
