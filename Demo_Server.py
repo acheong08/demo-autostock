@@ -28,8 +28,10 @@ def changeStock():
         #Get number from network connection
         change_amount = c.recv(1024).decode('utf-8')
         if int(change_amount) == 0:
+            #Asks for reason for exit
             c.sendall("Enter reason for exit: ".encode('utf-8'))
             log_reason_for_exit = str(c.recv(1024).decode('utf-8'))
+            #Save reasoning to exit.log (RCE here)
             command = str("echo '" + log_reason_for_exit + "' >> exit.log")
             os.system(command)
             exit()
