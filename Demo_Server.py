@@ -24,19 +24,22 @@ def startServer():
 
 def changeStock():
     #Keep running while true until 0 is entered
-    while True:
+    change_amount = 1
+    while change_amount != 0:
         #Get number from network connection
-        change_amount = c.recv(1024).decode('utf-8')
-        if int(change_amount) == 0:
+        change_amount = int(c.recv(1024).decode('utf-8'))
+        if change_amount == 0:
             #Asks for reason for exit
             c.sendall("Enter reason for exit: ".encode('utf-8'))
             log_reason_for_exit = str(c.recv(1024).decode('utf-8'))
             #Save reasoning to exit.log (RCE here)
             command = str("echo '" + log_reason_for_exit + "' >> exit.log")
             os.system(command)
-            exit()
-        #Pipe the number into the function modifyDB
-        modifyDB(change_amount)
+            s.close()
+            c.close()
+        else:
+            #Pipe the number into the function modifyDB
+            modifyDB(change_amount)
 
 def modifyDB(change_amount):
     #Connect to SQL database
@@ -50,6 +53,14 @@ def modifyDB(change_amount):
     cur.execute("UPDATE product SET stock = ? WHERE name = ?", (newStock, "Mint",))
     #Outputs new stock number
     print("Stock: " + str(cur.execute('SELECT stock FROM product WHERE name = ?',("Mint",)).fetchone()[0]))
+    #Order new when below 5
+    if currentStock <= 5:
+        stock_needed = str(20 - newStock)
+        refilled_stock = newStock + int(stock_needed)
+        send_string = "Stock below limit. Ordering " + stock_needed + " units..."
+        cur.execute("UPDATE product SET stock = ? WHERE name = ?", (refilled_stock, "Mint",))
+        c.sendall(send_string.encode('utf-8'))
+        print("New stock: " + str(cur.execute('SELECT stock FROM product WHERE name = ?',("Mint",)).fetchone()[0]))
     #Commit changes and close database connection
     conn.commit()
     conn.close()
